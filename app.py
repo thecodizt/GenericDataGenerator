@@ -44,17 +44,11 @@ def main():
                 st.subheader("Node Data")
                 st.dataframe(node_data)
                 
-                with st.expander("Visualize"):
-                    visualize_node_data(node_data=node_data)
-                
                 st.download_button("Download Node Data", data=node_data.to_csv(), file_name='nodes.csv')
                 
             if len(edge_data):
                 st.subheader("Edge Data")
                 st.dataframe(edge_data)
-                
-                with st.expander("Visualize"):
-                    visualize_edge_data(edge_data=edge_data)
 
                 st.download_button("Download Edge Data", data=edge_data.to_csv(), file_name='edges.csv')
                 
