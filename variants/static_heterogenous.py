@@ -8,7 +8,7 @@ class StaticHeterogenous:
         
         num_nodes = st.number_input(label="Number of Nodes in Graph", min_value=1, step=1)
         lower_num_prop = st.number_input(label="Lower range for number of properties for each node", min_value=1, step=1)
-        upper_num_prop = st.number_input(label="Upper range for number of properties for each node", min_value=1, step=1)
+        upper_num_prop = st.number_input(label="Upper range for number of properties for each node", min_value=lower_num_prop+1, step=1)
         
         num_edge_features = st.number_input(label="Number of properties for each edge", min_value=1, step=1)
         edge_density = st.number_input(label="Edge Density in Adjacency Matrix", min_value=0.0, max_value=1.0, step=0.05)

@@ -2,7 +2,7 @@ import streamlit as st
 import random
 import networkx as nx
 
-from utils import generate_n_node_flat_data, generate_adjancency_matrix_with_none, adjacency_matrices_to_dataframe
+from utils import generate_n_node_flat_data_in_range, generate_adjancency_matrix_with_none, adjacency_matrices_to_dataframe
 
 edge_determination_options = [
             "random",
@@ -10,13 +10,14 @@ edge_determination_options = [
             "community based",
         ]
 
-class DynamicHomogenous:
+class DynamicHeterogenous:
     
     def input():
         num_records = st.number_input(label="Number of records for each node", min_value=100, step=10)
         
         num_nodes = st.number_input(label="Number of Nodes in Graph", min_value=1, step=1)
-        num_prop = st.number_input(label="Number of properties for each node", min_value=1, step=1)
+        lower_num_prop = st.number_input(label="Lower range for number of properties for each node", min_value=1, step=1)
+        upper_num_prop = st.number_input(label="Upper range for number of properties for each node", min_value=lower_num_prop+1, step=1)
         
         num_edge_features = st.number_input(label="Number of properties for each edge", min_value=1, step=1)
         edge_density = st.number_input(label="Edge Density in Adjacency Matrix", min_value=0.0, max_value=1.0, step=0.05)
@@ -29,10 +30,10 @@ class DynamicHomogenous:
         num_control_points = st.number_input(label="Number of Control Points in Generation", min_value=2, step=1)
         noise = st.number_input(label="Maximum Noise in Values", min_value=0.0, max_value=1.0, step=0.05)
         
-        return num_nodes, num_records, num_prop, num_edge_features, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination, noise, num_control_points
+        return num_nodes, num_records, lower_num_prop, upper_num_prop, num_edge_features, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination, noise, num_control_points
     
-    def generate_node_data(num_records, num_nodes, num_prop, num_control_points, noise):
-        merged_data = generate_n_node_flat_data(num_nodes=num_nodes, num_records=num_records, num_control_points=num_control_points, num_properties=num_prop, noise=noise)
+    def generate_node_data(num_records, num_nodes, num_control_points, noise, lower_num_prop, upper_num_prop):
+        merged_data = generate_n_node_flat_data_in_range(num_nodes=num_nodes, num_records=num_records, num_control_points=num_control_points, lower_num_properties=lower_num_prop, upper_num_properties=upper_num_prop, noise=noise)
         return merged_data
     
     def generate_edge_data(num_nodes, num_records, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination, num_edge_features):
@@ -45,7 +46,7 @@ class DynamicHomogenous:
             results = [adjacency_matrix]
             
             while len(results) < num_records:
-                new_state = DynamicHomogenous.apply_variation(results[-1], new_edge_likelihood=new_edge_likelihood, delete_edge_likelihood=delete_edge_likelihood, edge_determination=edge_determination)
+                new_state = DynamicHeterogenous.apply_variation(results[-1], new_edge_likelihood=new_edge_likelihood, delete_edge_likelihood=delete_edge_likelihood, edge_determination=edge_determination)
                 results.append(new_state)
 
             main.append(results)
@@ -59,11 +60,11 @@ class DynamicHomogenous:
         
         # Code goes here
         if edge_determination == edge_determination_options[0]:
-            new_state = DynamicHomogenous.random_change(graph_state=graph_state, add_prob=new_edge_likelihood, del_prob=delete_edge_likelihood)
+            new_state = DynamicHeterogenous.random_change(graph_state=graph_state, add_prob=new_edge_likelihood, del_prob=delete_edge_likelihood)
         elif edge_determination == edge_determination_options[1]:
-            new_state = DynamicHomogenous.criticality_change(graph_state=graph_state, add_prob=new_edge_likelihood, del_prob=delete_edge_likelihood)
+            new_state = DynamicHeterogenous.criticality_change(graph_state=graph_state, add_prob=new_edge_likelihood, del_prob=delete_edge_likelihood)
         elif edge_determination == edge_determination_options[2]:
-            new_state = DynamicHomogenous.communities_change(graph_state=graph_state, add_prob=new_edge_likelihood, del_prob=delete_edge_likelihood)
+            new_state = DynamicHeterogenous.communities_change(graph_state=graph_state, add_prob=new_edge_likelihood, del_prob=delete_edge_likelihood)
         
         return new_state
     
@@ -94,14 +95,14 @@ class DynamicHomogenous:
                     if graph_state[i][j] is not None:
                         out_degrees[i] += 1
                         in_degrees[j] += 1
-                        
+                    
         return in_degrees, out_degrees
 
     def criticality_change(graph_state, add_prob, del_prob):
         n = len(graph_state)
         new_state = [row[:] for row in graph_state]
         
-        in_degrees, out_degrees = DynamicHomogenous.compute_node_degrees(graph_state)
+        in_degrees, out_degrees = DynamicHeterogenous.compute_node_degrees(graph_state)
         
         for i in range(n):
             for j in range(n):
@@ -147,7 +148,7 @@ class DynamicHomogenous:
         n = len(graph_state)
         new_state = [row[:] for row in graph_state]
         
-        node_to_community = DynamicHomogenous.detect_communities(graph_state)
+        node_to_community = DynamicHeterogenous.detect_communities(graph_state)
         
         for i in range(n):
             for j in range(n):
