@@ -105,6 +105,19 @@ def generate_n_node_flat_data(num_nodes, num_records, num_properties, num_contro
         
     return merge_melted_dfs(flat_dfs)
 
+
+def generate_n_node_flat_data_in_range(num_nodes, num_records, lower_num_properties, upper_num_properties, num_control_points, noise):
+    flat_dfs = []
+    
+    while (len(flat_dfs)) < num_nodes:
+        num_properties = random.randint(lower_num_properties, upper_num_properties)
+        generated_node_data = generate_node_data(num_properties, num_records, num_control_points, noise)
+        generated_node_data = array_to_dataframe(generated_node_data)
+        flat_df = flatten_dataframe(generated_node_data)
+        flat_dfs.append(flat_df)
+        
+    return merge_melted_dfs(flat_dfs)
+
 def get_node_data_from_merged(merged_data, node_index):
     filtered = merged_data[merged_data["entity"] == node_index]
     filtered.drop(["entity"], axis=1, inplace=True)

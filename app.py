@@ -1,6 +1,6 @@
 import streamlit as st
 
-from variants import StaticHomogenous, DynamicHomogenous
+from variants import StaticHomogenous, DynamicHomogenous, StaticHeterogenous
 from utils import visualize_node_data, visualize_edge_data
 
 def main():
@@ -54,7 +54,37 @@ def main():
                 st.download_button("Download Edge Data", data=edge_data.to_csv(), file_name='edges.csv')
                 
         else:
-            pass
+            num_nodes, num_records, lower_num_prop, upper_num_prop, num_edge_features, edge_density, noise, num_control_points = StaticHeterogenous.input()
+            
+            node_data = StaticHeterogenous.generate_node_data(
+                num_nodes=num_nodes, 
+                num_records=num_records, 
+                noise=noise, 
+                num_control_points=num_control_points,
+                lower_num_prop=lower_num_prop,
+                upper_num_prop=upper_num_prop
+            )
+            
+            edge_data = StaticHeterogenous.generate_edge_data(
+                edge_density=edge_density,
+                num_nodes=num_nodes,
+                num_edge_features=num_edge_features
+            )
+            
+            st.header("Generated Data")
+            
+            if len(node_data):
+                st.subheader("Node Data")
+                st.dataframe(node_data)
+                
+                st.download_button("Download Node Data", data=node_data.to_csv(), file_name='nodes.csv')
+                
+            if len(edge_data):
+                st.subheader("Edge Data")
+                st.dataframe(edge_data)
+
+                st.download_button("Download Edge Data", data=edge_data.to_csv(), file_name='edges.csv')
+                
     else:
         if node_type == node_types[0]:
             num_nodes, num_records, num_prop, num_edge_features, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination, noise, num_control_points = DynamicHomogenous.input()

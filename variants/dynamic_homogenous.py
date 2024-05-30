@@ -1,14 +1,16 @@
 import streamlit as st
 import random
+import networkx as nx
 
 from utils import generate_n_node_flat_data, generate_adjancency_matrix_with_none, adjacency_matrices_to_dataframe
 
 edge_determination_options = [
-            "random"
+            "random",
+            "criticality based",
+            "community based",
         ]
 
 class DynamicHomogenous:
-    
     
     def input():
         num_records = st.number_input(label="Number of records for each node", min_value=100, step=10)
@@ -58,23 +60,111 @@ class DynamicHomogenous:
         # Code goes here
         if edge_determination == edge_determination_options[0]:
             new_state = DynamicHomogenous.random_change(graph_state=graph_state, add_prob=new_edge_likelihood, del_prob=delete_edge_likelihood)
+        elif edge_determination == edge_determination_options[1]:
+            new_state = DynamicHomogenous.criticality_change(graph_state=graph_state, add_prob=new_edge_likelihood, del_prob=delete_edge_likelihood)
+        elif edge_determination == edge_determination_options[2]:
+            new_state = DynamicHomogenous.communities_change(graph_state=graph_state, add_prob=new_edge_likelihood, del_prob=delete_edge_likelihood)
         
         return new_state
     
     def random_change(graph_state, add_prob, del_prob):
         n = len(graph_state)
-        new_state = [row[:] for row in graph_state]  # Create a deep copy of the graph state
+        new_state = [row[:] for row in graph_state]
 
-        # Iterate through each possible edge in the adjacency matrix
         for i in range(n):
-            for j in range(i + 1, n):  # Ensure we do not duplicate edges (i, j) and (j, i) and skip self-loops
-                if graph_state[i][j] is None:  # No edge currently
+            for j in range(n): 
+                if graph_state[i][j] is None:
                     if random.random() < add_prob:
                         new_state[i][j] = 1
-                        new_state[j][i] = 1
-                else:  # Edge exists
+                else:
                     if random.random() < del_prob:
                         new_state[i][j] = None
-                        new_state[j][i] = None
+
+        return new_state
+    
+    def compute_node_degrees(graph_state):
+        n = len(graph_state)
+        in_degrees = [0] * n
+        out_degrees = [0] * n
+        
+        for i in range(n):
+            for j in range(n):
+                if graph_state[i][j] is not None:
+                    out_degrees[i] += 1
+                    in_degrees[j] += 1
+                    
+        return in_degrees, out_degrees
+
+    def criticality_change(graph_state, add_prob, del_prob):
+        n = len(graph_state)
+        new_state = [row[:] for row in graph_state]
+        
+        in_degrees, out_degrees = DynamicHomogenous.compute_node_degrees(graph_state)
+        
+        for i in range(n):
+            for j in range(n):
+                if i != j:
+                    if graph_state[i][j] is None:
+                        prob = add_prob * (1 - (out_degrees[i] / n)) * (1 - (in_degrees[j] / n))
+                        if random.random() < prob:
+                            new_state[i][j] = 1 
+                    else:
+                        prob = del_prob * (out_degrees[i] / n) * (in_degrees[j] / n)
+                        if random.random() < prob:
+                            new_state[i][j] = None 
+
+        return new_state
+    
+    def detect_communities(graph_state):
+        G = nx.DiGraph()
+        n = len(graph_state)
+        
+        # Build the graph
+        for i in range(n):
+            for j in range(n):
+                if graph_state[i][j] is not None:
+                    G.add_edge(i, j)
+        
+        # Detect communities
+        communities = list(nx.community.greedy_modularity_communities(G))
+        node_to_community = {}
+        
+        # Assign nodes to communities
+        for i, community in enumerate(communities):
+            for node in community:
+                node_to_community[node] = i
+                
+        # Ensure all nodes are assigned to a community
+        for node in range(n):
+            if node not in node_to_community:
+                node_to_community[node] = len(communities)  # Assign to a new community
+        
+        return node_to_community
+
+    def communities_change(graph_state, add_prob, del_prob):
+        n = len(graph_state)
+        new_state = [row[:] for row in graph_state]
+        
+        node_to_community = DynamicHomogenous.detect_communities(graph_state)
+        
+        for i in range(n):
+            for j in range(n):
+                if i != j:
+                    if graph_state[i][j] is None:
+                        if node_to_community[i] == node_to_community[j]:
+                            prob = add_prob * 1.5  # Higher probability for intra-community edges
+                        else:
+                            prob = add_prob * 0.5  # Lower probability for inter-community edges
+                        
+                        if random.random() < prob:
+                            new_state[i][j] = 1  # Add a directed edge
+                    else:
+                        if node_to_community[i] == node_to_community[j]:
+                            prob = del_prob * 0.5  # Lower probability for intra-community edges
+                        else:
+                            prob = del_prob * 1.5  # Higher probability for inter-community edges
+                        
+                        if random.random() < prob:
+                            new_state[i][j] = None  # Remove the directed edge
 
         return new_state
