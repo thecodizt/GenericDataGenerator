@@ -117,9 +117,9 @@ def adjacency_matrices_to_dataframe(adjacency_matrices):
     rows = []
     
     # Iterate through each adjacency matrix with its timestamp
-    for time, matrix in enumerate(adjacency_matrices):
+    for feature_id, time_matrix in enumerate(adjacency_matrices):
         
-        for feature_id, feature_matrix in enumerate(matrix):
+        for time, feature_matrix in enumerate(time_matrix):
             
             for i in range(len(feature_matrix)):
                 for j in range(len(feature_matrix[i])):

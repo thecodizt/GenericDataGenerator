@@ -23,7 +23,7 @@ def main():
     
     if graph_type == graph_types[0]:
         if node_type == node_types[0]:
-            num_nodes, num_records, num_prop, edge_density, noise, num_control_points = StaticHomogenous.input()
+            num_nodes, num_records, num_prop, num_edge_features, edge_density, noise, num_control_points = StaticHomogenous.input()
             
             node_data = StaticHomogenous.generate_node_data(
                 num_nodes=num_nodes, 
@@ -35,7 +35,8 @@ def main():
             
             edge_data = StaticHomogenous.generate_edge_data(
                 edge_density=edge_density,
-                num_nodes=num_nodes
+                num_nodes=num_nodes,
+                num_edge_features=num_edge_features
             )
             
             st.header("Generated Data")
@@ -56,11 +57,11 @@ def main():
             pass
     else:
         if node_type == node_types[0]:
-            num_nodes, num_records, num_prop, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination, noise, num_control_points = DynamicHomogenous.input()
+            num_nodes, num_records, num_prop, num_edge_features, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination, noise, num_control_points = DynamicHomogenous.input()
             
             node_data = DynamicHomogenous.generate_node_data(
                 num_nodes=num_nodes, 
-                num_records=num_records, 
+                num_records=num_records,
                 num_prop=num_prop, 
                 noise=noise, 
                 num_control_points=num_control_points
@@ -72,7 +73,8 @@ def main():
                edge_density = edge_density, 
                new_edge_likelihood = new_edge_likelihood, 
                delete_edge_likelihood = delete_edge_likelihood, 
-               edge_determination = edge_determination
+               edge_determination = edge_determination,
+               num_edge_features=num_edge_features
             )
             
             st.header("Generated Data")

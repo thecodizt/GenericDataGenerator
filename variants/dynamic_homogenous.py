@@ -16,10 +16,10 @@ class DynamicHomogenous:
         num_nodes = st.number_input(label="Number of Nodes in Graph", min_value=1, step=1)
         num_prop = st.number_input(label="Number of properties for each node", min_value=1, step=1)
         
+        num_edge_features = st.number_input(label="Number of properties for each edge", min_value=1, step=1)
         edge_density = st.number_input(label="Edge Density in Adjacency Matrix", min_value=0.0, max_value=1.0, step=0.05)
         new_edge_likelihood = st.number_input(label="Probabilty of new edge creation", min_value=0.0, max_value=1.0, step=0.05)
         delete_edge_likelihood = st.number_input(label="Probability of edge deletion", min_value=0.0, max_value=1.0, step=0.05)
-        
         
         edge_determination = st.selectbox(label="Algorithm for determining edge changes", options=edge_determination_options)
         
@@ -27,22 +27,28 @@ class DynamicHomogenous:
         num_control_points = st.number_input(label="Number of Control Points in Generation", min_value=2, step=1)
         noise = st.number_input(label="Maximum Noise in Values", min_value=0.0, max_value=1.0, step=0.05)
         
-        return num_nodes, num_records, num_prop, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination, noise, num_control_points
+        return num_nodes, num_records, num_prop, num_edge_features, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination, noise, num_control_points
     
     def generate_node_data(num_records, num_nodes, num_prop, num_control_points, noise):
         merged_data = generate_n_node_flat_data(num_nodes=num_nodes, num_records=num_records, num_control_points=num_control_points, num_properties=num_prop, noise=noise)
         return merged_data
     
-    def generate_edge_data(num_nodes, num_records, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination):
-        adjacency_matrix = generate_adjancency_matrix_with_none(num_nodes=num_nodes, density=edge_density)
+    def generate_edge_data(num_nodes, num_records, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination, num_edge_features):
+        main = []
         
-        results = [adjacency_matrix]
+        while len(main) < num_edge_features:
+            
+            adjacency_matrix = generate_adjancency_matrix_with_none(num_nodes=num_nodes, density=edge_density)
+            
+            results = [adjacency_matrix]
+            
+            while len(results) < num_records:
+                new_state = DynamicHomogenous.apply_variation(results[-1], new_edge_likelihood=new_edge_likelihood, delete_edge_likelihood=delete_edge_likelihood, edge_determination=edge_determination)
+                results.append(new_state)
+
+            main.append(results)
         
-        while len(results) < num_records:
-            new_state = DynamicHomogenous.apply_variation(results[-1], new_edge_likelihood=new_edge_likelihood, delete_edge_likelihood=delete_edge_likelihood, edge_determination=edge_determination)
-            results.append(new_state)
-        
-        df = adjacency_matrices_to_dataframe(adjacency_matrices=[results])
+        df = adjacency_matrices_to_dataframe(adjacency_matrices=main)
         
         return df
     
