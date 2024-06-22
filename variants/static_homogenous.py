@@ -20,22 +20,30 @@ class StaticHomogenous:
         num_edge_features = st.number_input(label="Number of properties for each edge", min_value=1, step=1)
         edge_density = st.number_input(label="Edge Density in Adjacency Matrix", min_value=0.0, max_value=1.0, step=0.05)
         
+        is_custom_edge_feature_names = st.checkbox(label="Custom Edge Feature Names")
+        
+        if is_custom_edge_feature_names:
+            edge_feature_names = st.text_input("Enter Edge Feature Names (comma seperated)")
+            edge_feature_names = edge_feature_names.split(',')
+        else:
+            edge_feature_names = None
+        
         num_control_points = st.number_input(label="Number of Control Points in Generation", min_value=2, step=1)
         noise = st.number_input(label="Maximum Noise in Values", min_value=0.0, max_value=1.0, step=0.05)
         
-        return num_nodes, num_records, num_prop, node_feature_names, num_edge_features, edge_density, noise, num_control_points
+        return num_nodes, num_records, num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names, noise, num_control_points
     
     def generate_node_data(num_records, num_nodes, num_prop, num_control_points, noise, features=None):
         merged_data = generate_n_node_flat_data_in_range(num_nodes=num_nodes, num_records=num_records, num_control_points=num_control_points, lower_num_properties=num_prop, upper_num_properties=num_prop, noise=noise, features=features)
         return merged_data
     
-    def generate_edge_data(num_nodes, num_edge_features, edge_density):
+    def generate_edge_data(num_nodes, num_edge_features, edge_density, features=None):
         main = []
         
         for i in range(num_edge_features):
             adjacency_matrix = generate_adjancency_matrix_with_none(num_nodes=num_nodes, density=edge_density)
             main.append([adjacency_matrix])
             
-        df = adjacency_matrices_to_dataframe(adjacency_matrices=main)
+        df = adjacency_matrices_to_dataframe(adjacency_matrices=main, features=features)
         
         return df

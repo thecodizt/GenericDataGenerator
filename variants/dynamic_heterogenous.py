@@ -29,6 +29,15 @@ class DynamicHeterogenous:
         
         num_edge_features = st.number_input(label="Number of properties for each edge", min_value=1, step=1)
         edge_density = st.number_input(label="Edge Density in Adjacency Matrix", min_value=0.0, max_value=1.0, step=0.05)
+        
+        is_custom_edge_feature_names = st.checkbox("Custom Edge Feature Names")
+        
+        if is_custom_edge_feature_names:
+            edge_feature_names = st.text_input("Enter Edge Feature Names (comma seperated)")
+            edge_feature_names = edge_feature_names.split(',')
+        else:
+            edge_feature_names = None
+            
         new_edge_likelihood = st.number_input(label="Probabilty of new edge creation", min_value=0.0, max_value=1.0, step=0.05)
         delete_edge_likelihood = st.number_input(label="Probability of edge deletion", min_value=0.0, max_value=1.0, step=0.05)
         
@@ -38,13 +47,13 @@ class DynamicHeterogenous:
         num_control_points = st.number_input(label="Number of Control Points in Generation", min_value=2, step=1)
         noise = st.number_input(label="Maximum Noise in Values", min_value=0.0, max_value=1.0, step=0.05)
         
-        return num_nodes, num_records, lower_num_prop, upper_num_prop, node_feature_names, num_edge_features, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination, noise, num_control_points
+        return num_nodes, num_records, lower_num_prop, upper_num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names, new_edge_likelihood, delete_edge_likelihood, edge_determination, noise, num_control_points
     
     def generate_node_data(num_records, num_nodes, num_control_points, noise, lower_num_prop, upper_num_prop, features=None):
         merged_data = generate_n_node_flat_data_in_range(num_nodes=num_nodes, num_records=num_records, num_control_points=num_control_points, lower_num_properties=lower_num_prop, upper_num_properties=upper_num_prop, noise=noise, features=features)
         return merged_data
     
-    def generate_edge_data(num_nodes, num_records, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination, num_edge_features):
+    def generate_edge_data(num_nodes, num_records, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination, num_edge_features, features=None):
         main = []
         
         while len(main) < num_edge_features:
@@ -59,7 +68,7 @@ class DynamicHeterogenous:
 
             main.append(results)
         
-        df = adjacency_matrices_to_dataframe(adjacency_matrices=main)
+        df = adjacency_matrices_to_dataframe(adjacency_matrices=main, features=features)
         
         return df
     

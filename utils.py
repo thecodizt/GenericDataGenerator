@@ -117,8 +117,11 @@ def get_node_data_from_merged(merged_data, node_index):
     
     return unflattened
 
-def adjacency_matrices_to_dataframe(adjacency_matrices):
+def adjacency_matrices_to_dataframe(adjacency_matrices, features):
     rows = []
+    
+    if features is None:
+        features = list(range(len(adjacency_matrices)))
     
     # Iterate through each adjacency matrix with its timestamp
     for feature_id, time_matrix in enumerate(adjacency_matrices):
@@ -127,7 +130,7 @@ def adjacency_matrices_to_dataframe(adjacency_matrices):
             
             for i in range(len(feature_matrix)):
                 for j in range(len(feature_matrix[i])):
-                    rows.append([time, i, j, feature_id, feature_matrix[i][j]])
+                    rows.append([time, i, j, features[feature_id], feature_matrix[i][j]])
 
     # Convert to DataFrame
     df = pd.DataFrame(rows, columns=['timestamp', 'source', 'target', 'feature', 'value'])
