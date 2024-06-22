@@ -8,7 +8,7 @@ import networkx as nx
 from sklearn.metrics import mean_squared_error
 import plotly.express as px
 
-def generate_adjancency_matrix_with_none(num_nodes, density = 0.5, allow_self_edge=False):
+def generate_adjancency_matrix_with_none(num_nodes, density = 0.5, allow_self_edge=False, edge_weight_lower=1, edge_weight_upper=1):
     adj_matrix = [[None for i in range(num_nodes)] for j in range(num_nodes)]
     
     current_density = 0
@@ -19,7 +19,7 @@ def generate_adjancency_matrix_with_none(num_nodes, density = 0.5, allow_self_ed
             j = random.randint(0,num_nodes-1)
             
             if not adj_matrix[i][j]:
-                adj_matrix[i][j] = 1
+                adj_matrix[i][j] = edge_weight_lower if (edge_weight_lower == edge_weight_upper) else random.uniform(edge_weight_lower, edge_weight_upper)
                 current_density += 1/(num_nodes*num_nodes)
     
                 if not allow_self_edge:

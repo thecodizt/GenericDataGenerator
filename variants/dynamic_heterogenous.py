@@ -18,9 +18,9 @@ class DynamicHeterogenous:
         
         num_nodes, node_lower_range, node_upper_range, lower_num_prop, upper_num_prop, node_feature_names, num_control_points, noise  = node_heterogeneous()
         
-        num_edge_features, edge_density, edge_feature_names, new_edge_likelihood, delete_edge_likelihood, edge_determination= edge_dynamic()
+        num_edge_features, edge_density, edge_feature_names, new_edge_likelihood, delete_edge_likelihood, edge_determination, edge_weight_lower, edge_weight_upper = edge_dynamic()
         
-        return num_nodes, node_lower_range, node_upper_range, num_records, lower_num_prop, upper_num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names, new_edge_likelihood, delete_edge_likelihood, edge_determination, noise, num_control_points
+        return num_nodes, node_lower_range, node_upper_range, num_records, lower_num_prop, upper_num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names, new_edge_likelihood, delete_edge_likelihood, edge_determination, noise, num_control_points, edge_weight_lower, edge_weight_upper
     
     def generate_node_data(num_records, num_nodes, num_control_points, noise, lower_num_prop, upper_num_prop, features=None, node_lower_range=0, node_upper_range=1):
         merged_data = generate_n_node_flat_data_in_range(
@@ -36,12 +36,12 @@ class DynamicHeterogenous:
         )
         return merged_data
     
-    def generate_edge_data(num_nodes, num_records, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination, num_edge_features, features=None):
+    def generate_edge_data(num_nodes, num_records, edge_density, new_edge_likelihood, delete_edge_likelihood, edge_determination, num_edge_features, features=None, edge_weight_lower=1, edge_weight_upper=1):
         main = []
         
         while len(main) < num_edge_features:
             
-            adjacency_matrix = generate_adjancency_matrix_with_none(num_nodes=num_nodes, density=edge_density)
+            adjacency_matrix = generate_adjancency_matrix_with_none(num_nodes=num_nodes, density=edge_density, edge_weight_lower=edge_weight_lower, edge_weight_upper=edge_weight_upper)
             
             results = [adjacency_matrix]
             

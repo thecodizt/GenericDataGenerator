@@ -23,7 +23,7 @@ def main():
     
     if graph_type == graph_types[0]:
         if node_type == node_types[0]:
-            num_nodes, node_lower_range, node_upper_range, num_records, num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names ,noise, num_control_points = StaticHomogenous.input()
+            num_nodes, node_lower_range, node_upper_range, num_records, num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names ,noise, num_control_points, edge_weight_lower, edge_weight_upper = StaticHomogenous.input()
             
             node_data = StaticHomogenous.generate_node_data(
                 num_nodes=num_nodes, 
@@ -40,7 +40,9 @@ def main():
                 edge_density=edge_density,
                 num_nodes=num_nodes,
                 num_edge_features=num_edge_features,
-                features=edge_feature_names
+                features=edge_feature_names,
+                edge_weight_lower=edge_weight_lower,
+                edge_weight_upper=edge_weight_upper,
             )
             
             st.header("Generated Data")
@@ -58,7 +60,7 @@ def main():
                 st.download_button("Download Edge Data", data=edge_data.to_csv(), file_name='edges.csv')
                 
         else:
-            num_nodes, node_lower_range, node_upper_range, num_records, lower_num_prop, upper_num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names, noise, num_control_points = StaticHeterogenous.input()
+            num_nodes, node_lower_range, node_upper_range, num_records, lower_num_prop, upper_num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names, noise, num_control_points, edge_weight_lower, edge_weight_upper = StaticHeterogenous.input()
             
             node_data = StaticHeterogenous.generate_node_data(
                 num_nodes=num_nodes, 
@@ -76,7 +78,9 @@ def main():
                 edge_density=edge_density,
                 num_nodes=num_nodes,
                 num_edge_features=num_edge_features,
-                features=edge_feature_names
+                features=edge_feature_names,
+                edge_weight_lower=edge_weight_lower,
+                edge_weight_upper=edge_weight_upper,
             )
             
             st.header("Generated Data")
@@ -95,7 +99,7 @@ def main():
                 
     else:
         if node_type == node_types[0]:
-            num_nodes, node_lower_range, node_upper_range, num_records, num_prop, node_feature_names,  num_edge_features, edge_density, edge_feature_names, new_edge_likelihood, delete_edge_likelihood ,edge_determination, noise, num_control_points = DynamicHomogenous.input()
+            num_nodes, node_lower_range, node_upper_range, num_records, num_prop, node_feature_names,  num_edge_features, edge_density, edge_feature_names, new_edge_likelihood, delete_edge_likelihood ,edge_determination, noise, num_control_points, edge_weight_lower, edge_weight_upper = DynamicHomogenous.input()
             
             node_data = DynamicHomogenous.generate_node_data(
                 num_nodes=num_nodes, 
@@ -116,7 +120,9 @@ def main():
                delete_edge_likelihood = delete_edge_likelihood, 
                edge_determination = edge_determination,
                num_edge_features=num_edge_features,
-               features=edge_feature_names
+               features=edge_feature_names,
+               edge_weight_lower=edge_weight_lower,
+                edge_weight_upper=edge_weight_upper,
             )
             
             st.header("Generated Data")
@@ -133,7 +139,7 @@ def main():
 
                 st.download_button("Download Edge Data", data=edge_data.to_csv(), file_name='edges.csv')
         else:
-            num_nodes, node_lower_range, node_upper_range, num_records, lower_num_prop, upper_num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names, new_edge_likelihood, delete_edge_likelihood, edge_determination, noise, num_control_points = DynamicHeterogenous.input()
+            num_nodes, node_lower_range, node_upper_range, num_records, lower_num_prop, upper_num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names, new_edge_likelihood, delete_edge_likelihood, edge_determination, noise, num_control_points, edge_weight_lower, edge_weight_upper = DynamicHeterogenous.input()
             
             node_data = DynamicHeterogenous.generate_node_data(
                 num_nodes=num_nodes, 
@@ -156,6 +162,8 @@ def main():
                 edge_determination = edge_determination,
                 num_edge_features=num_edge_features,
                 features=edge_feature_names,
+                edge_weight_lower = edge_weight_lower, 
+                edge_weight_upper = edge_weight_upper,
             )
             
             st.header("Generated Data")

@@ -9,9 +9,9 @@ class StaticHomogenous:
         
         num_nodes, node_lower_range, node_upper_range, num_prop, node_feature_names, num_control_points, noise = node_homogeneous()
         
-        num_edge_features, edge_density, num_control_points, edge_feature_names = edge_static()
+        num_edge_features, edge_density, edge_feature_names, edge_weight_lower, edge_weight_upper = edge_static()
         
-        return num_nodes, node_lower_range, node_upper_range, num_records, num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names, noise, num_control_points
+        return num_nodes, node_lower_range, node_upper_range, num_records, num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names, noise, num_control_points, edge_weight_lower, edge_weight_upper
     
     def generate_node_data(num_records, num_nodes, num_prop, num_control_points, noise, features=None, node_lower_range = 0, node_upper_range=1):
         merged_data = generate_n_node_flat_data_in_range(
@@ -27,11 +27,11 @@ class StaticHomogenous:
         )
         return merged_data
     
-    def generate_edge_data(num_nodes, num_edge_features, edge_density, features=None):
+    def generate_edge_data(num_nodes, num_edge_features, edge_density, features=None, edge_weight_lower=1, edge_weight_upper=1):
         main = []
         
         for i in range(num_edge_features):
-            adjacency_matrix = generate_adjancency_matrix_with_none(num_nodes=num_nodes, density=edge_density)
+            adjacency_matrix = generate_adjancency_matrix_with_none(num_nodes=num_nodes, density=edge_density, edge_weight_lower=edge_weight_lower, edge_weight_upper= edge_weight_upper)
             main.append([adjacency_matrix])
             
         df = adjacency_matrices_to_dataframe(adjacency_matrices=main, features=features)

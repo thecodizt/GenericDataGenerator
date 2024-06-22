@@ -1,6 +1,8 @@
 import streamlit as st
 
 def node_base():
+    st.subheader("Node Input")
+    
     num_nodes = st.number_input(label="Number of Nodes in Graph", min_value=1, step=1)
         
     is_custom_node_range = st.checkbox("Custom Node Feature Range (defaults to 0 to 1)")
@@ -27,8 +29,9 @@ def node_base():
     return num_nodes, node_upper_range, node_lower_range, node_feature_names, num_control_points, noise
 
 def edge_base():
+    st.subheader("Edge Input")
+    
     num_edge_features = st.number_input(label="Number of properties for each edge", min_value=1, step=1)
-    edge_density = st.number_input(label="Edge Density in Adjacency Matrix", min_value=0.0, max_value=1.0, step=0.05)
     
     is_custom_edge_feature_names = st.checkbox(label="Custom Edge Feature Names")
     
@@ -38,7 +41,18 @@ def edge_base():
     else:
         edge_feature_names = None
         
-    return num_edge_features, edge_density, edge_feature_names
+    edge_density = st.number_input(label="Edge Density in Adjacency Matrix", min_value=0.0, max_value=1.0, step=0.05)
+    
+    is_custom_weights = st.checkbox("Custom Edge Weights")
+    
+    if is_custom_weights:
+        edge_weight_upper = st.number_input("Lower range for edge upper")
+        edge_weight_lower = st.number_input("Lower range for edge weight", max_value=edge_weight_upper)
+    else:
+        edge_weight_upper = 1
+        edge_weight_lower = 1
+    
+    return num_edge_features, edge_density, edge_feature_names, edge_weight_lower, edge_weight_upper
 
 def node_homogeneous():
     num_nodes, node_upper_range, node_lower_range, node_feature_names, num_control_points, noise = node_base()
@@ -57,9 +71,9 @@ def node_heterogeneous():
     return num_nodes, node_lower_range, node_upper_range, lower_num_prop, upper_num_prop, node_feature_names, num_control_points, noise
 
 def edge_static():
-    num_edge_features, edge_density, edge_feature_names = edge_base()
+    num_edge_features, edge_density, edge_feature_names, edge_weight_lower, edge_weight_upper = edge_base()
     
-    return num_edge_features, edge_density, edge_feature_names
+    return num_edge_features, edge_density, edge_feature_names, edge_weight_lower, edge_weight_upper
 
 def edge_dynamic():
     edge_determination_options = [
@@ -68,11 +82,11 @@ def edge_dynamic():
             "community based",
         ]
     
-    num_edge_features, edge_density, edge_feature_names = edge_base()
+    num_edge_features, edge_density, edge_feature_names, edge_weight_lower, edge_weight_upper = edge_base()
         
     new_edge_likelihood = st.number_input(label="Probabilty of new edge creation", min_value=0.0, max_value=1.0, step=0.05)
     delete_edge_likelihood = st.number_input(label="Probability of edge deletion", min_value=0.0, max_value=1.0, step=0.05)
     
     edge_determination = st.selectbox(label="Algorithm for determining edge changes", options=edge_determination_options)
     
-    return num_edge_features, edge_density, edge_feature_names, new_edge_likelihood, delete_edge_likelihood, edge_determination
+    return num_edge_features, edge_density, edge_feature_names, new_edge_likelihood, delete_edge_likelihood, edge_determination, edge_weight_lower, edge_weight_upper
