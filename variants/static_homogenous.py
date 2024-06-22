@@ -7,6 +7,16 @@ class StaticHomogenous:
         num_records = st.number_input(label="Number of records for each node", min_value=100, step=10)
         
         num_nodes = st.number_input(label="Number of Nodes in Graph", min_value=1, step=1)
+        
+        is_custom_node_range = st.checkbox("Custom Node Feature Range (defaults to 0 to 1)")
+        
+        if is_custom_node_range:
+            node_upper_range = st.number_input("Upper limit for values")
+            node_lower_range = st.number_input("Lower limit for values", max_value=node_upper_range)
+        else:
+            node_upper_range = 1
+            node_lower_range = 0
+        
         num_prop = st.number_input(label="Number of properties for each node", min_value=1, step=1)
         
         is_custom_node_feature_names = st.checkbox(label="Custom Node Feature Names")
@@ -31,10 +41,20 @@ class StaticHomogenous:
         num_control_points = st.number_input(label="Number of Control Points in Generation", min_value=2, step=1)
         noise = st.number_input(label="Maximum Noise in Values", min_value=0.0, max_value=1.0, step=0.05)
         
-        return num_nodes, num_records, num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names, noise, num_control_points
+        return num_nodes, node_lower_range, node_upper_range, num_records, num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names, noise, num_control_points
     
-    def generate_node_data(num_records, num_nodes, num_prop, num_control_points, noise, features=None):
-        merged_data = generate_n_node_flat_data_in_range(num_nodes=num_nodes, num_records=num_records, num_control_points=num_control_points, lower_num_properties=num_prop, upper_num_properties=num_prop, noise=noise, features=features)
+    def generate_node_data(num_records, num_nodes, num_prop, num_control_points, noise, features=None, node_lower_range = 0, node_upper_range=1):
+        merged_data = generate_n_node_flat_data_in_range(
+            num_nodes=num_nodes, 
+            num_records=num_records, 
+            num_control_points=num_control_points, 
+            lower_num_properties=num_prop, 
+            upper_num_properties=num_prop, 
+            noise=noise, 
+            features=features, 
+            node_lower_range=node_lower_range, 
+            node_upper_range=node_upper_range
+        )
         return merged_data
     
     def generate_edge_data(num_nodes, num_edge_features, edge_density, features=None):

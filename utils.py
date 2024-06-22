@@ -60,7 +60,7 @@ def generate_spline(control_points, n_points=100, noise=0):
 
     return y_new
 
-def generate_node_data(num_properties=1, num_records=100, num_control_points=10, noise=0, features=None):
+def generate_node_data(num_properties=1, num_records=100, num_control_points=10, noise=0, features=None, node_lower_range=0, node_upper_range=1):
     node_data = dict()
     
     if features is None:
@@ -68,6 +68,9 @@ def generate_node_data(num_properties=1, num_records=100, num_control_points=10,
             
     for i in range(num_properties):
         node_property = generate_spline(generate_control_points(num_control_points), num_records, noise)
+
+        node_property = node_property * (node_upper_range - node_lower_range) + node_lower_range
+        
         node_data[features[i]] = node_property
     
     # convert node data to dataframe
@@ -98,12 +101,12 @@ def array_to_dataframe(array_2d):
     df = pd.DataFrame(array_2d)
     return df
 
-def generate_n_node_flat_data_in_range(num_nodes, num_records, lower_num_properties, upper_num_properties, num_control_points, noise, features=None):
+def generate_n_node_flat_data_in_range(num_nodes, num_records, lower_num_properties, upper_num_properties, num_control_points, noise, features=None, node_lower_range=0, node_upper_range=1):
     flat_dfs = []
     
     while (len(flat_dfs)) < num_nodes:
         num_properties = random.randint(lower_num_properties, upper_num_properties)
-        generated_node_data = generate_node_data(num_properties, num_records, num_control_points, noise, features)
+        generated_node_data = generate_node_data(num_properties, num_records, num_control_points, noise, features, node_lower_range=node_lower_range, node_upper_range=node_upper_range)
         flat_df = flatten_dataframe(generated_node_data)
         flat_dfs.append(flat_df)
         
