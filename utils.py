@@ -60,16 +60,20 @@ def generate_spline(control_points, n_points=100, noise=0):
 
     return y_new
 
-def generate_node_data(num_properties=1, num_records=100, num_control_points=10, noise=0):
-    node_data = []
+def generate_node_data(num_properties=1, num_records=100, num_control_points=10, noise=0, features=None):
+    node_data = dict()
     
-    while len(node_data) < num_properties:
+    if features is None:
+        features = list(range(num_properties))
+            
+    for i in range(num_properties):
         node_property = generate_spline(generate_control_points(num_control_points), num_records, noise)
-        node_data.append(node_property)
+        node_data[features[i]] = node_property
+    
+    # convert node data to dataframe
+    generated_node_data = pd.DataFrame(node_data)
         
-    tranposed = [list(i) for i in zip(*node_data)]
-        
-    return tranposed
+    return generated_node_data
         
 def flatten_dataframe(df):
     df_flat = df.reset_index().melt(id_vars='index', var_name='column', value_name='value')
@@ -94,25 +98,12 @@ def array_to_dataframe(array_2d):
     df = pd.DataFrame(array_2d)
     return df
 
-def generate_n_node_flat_data(num_nodes, num_records, num_properties, num_control_points, noise):
-    flat_dfs = []
-    
-    while (len(flat_dfs)) < num_nodes:
-        generated_node_data = generate_node_data(num_properties, num_records, num_control_points, noise)
-        generated_node_data = array_to_dataframe(generated_node_data)
-        flat_df = flatten_dataframe(generated_node_data)
-        flat_dfs.append(flat_df)
-        
-    return merge_melted_dfs(flat_dfs)
-
-
-def generate_n_node_flat_data_in_range(num_nodes, num_records, lower_num_properties, upper_num_properties, num_control_points, noise):
+def generate_n_node_flat_data_in_range(num_nodes, num_records, lower_num_properties, upper_num_properties, num_control_points, noise, features=None):
     flat_dfs = []
     
     while (len(flat_dfs)) < num_nodes:
         num_properties = random.randint(lower_num_properties, upper_num_properties)
-        generated_node_data = generate_node_data(num_properties, num_records, num_control_points, noise)
-        generated_node_data = array_to_dataframe(generated_node_data)
+        generated_node_data = generate_node_data(num_properties, num_records, num_control_points, noise, features)
         flat_df = flatten_dataframe(generated_node_data)
         flat_dfs.append(flat_df)
         
