@@ -1,45 +1,15 @@
 import streamlit as st
 
 from utils import generate_n_node_flat_data_in_range, generate_adjancency_matrix_with_none, adjacency_matrices_to_dataframe
+from input import node_homogeneous, edge_static
 
 class StaticHomogenous:
     def input():
         num_records = st.number_input(label="Number of records for each node", min_value=100, step=10)
         
-        num_nodes = st.number_input(label="Number of Nodes in Graph", min_value=1, step=1)
+        num_nodes, node_lower_range, node_upper_range, num_prop, node_feature_names, num_control_points, noise = node_homogeneous()
         
-        is_custom_node_range = st.checkbox("Custom Node Feature Range (defaults to 0 to 1)")
-        
-        if is_custom_node_range:
-            node_upper_range = st.number_input("Upper limit for values")
-            node_lower_range = st.number_input("Lower limit for values", max_value=node_upper_range)
-        else:
-            node_upper_range = 1
-            node_lower_range = 0
-        
-        num_prop = st.number_input(label="Number of properties for each node", min_value=1, step=1)
-        
-        is_custom_node_feature_names = st.checkbox(label="Custom Node Feature Names")
-        
-        if is_custom_node_feature_names:
-            node_feature_names = st.text_input(label="Enter Node Feature Names (comma separated)")
-            node_feature_names = node_feature_names.split(",")
-        else:
-            node_feature_names = None
-        
-        num_edge_features = st.number_input(label="Number of properties for each edge", min_value=1, step=1)
-        edge_density = st.number_input(label="Edge Density in Adjacency Matrix", min_value=0.0, max_value=1.0, step=0.05)
-        
-        is_custom_edge_feature_names = st.checkbox(label="Custom Edge Feature Names")
-        
-        if is_custom_edge_feature_names:
-            edge_feature_names = st.text_input("Enter Edge Feature Names (comma seperated)")
-            edge_feature_names = edge_feature_names.split(',')
-        else:
-            edge_feature_names = None
-        
-        num_control_points = st.number_input(label="Number of Control Points in Generation", min_value=2, step=1)
-        noise = st.number_input(label="Maximum Noise in Values", min_value=0.0, max_value=1.0, step=0.05)
+        num_edge_features, edge_density, num_control_points, edge_feature_names = edge_static()
         
         return num_nodes, node_lower_range, node_upper_range, num_records, num_prop, node_feature_names, num_edge_features, edge_density, edge_feature_names, noise, num_control_points
     
