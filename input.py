@@ -65,8 +65,8 @@ def node_heterogeneous():
     
     num_nodes, node_upper_range, node_lower_range, node_feature_names, num_control_points, noise = node_base()
     
-    lower_num_prop = st.number_input(label="Lower range for number of properties for each node", min_value=1, step=1)
-    upper_num_prop = st.number_input(label="Upper range for number of properties for each node", min_value=lower_num_prop+1, step=1)
+    upper_num_prop = st.number_input(label="Upper range for number of properties for each node", min_value=1, step=1)
+    lower_num_prop = st.number_input(label="Lower range for number of properties for each node", min_value=1, max_value=upper_num_prop, step=1)
         
     return num_nodes, node_lower_range, node_upper_range, lower_num_prop, upper_num_prop, node_feature_names, num_control_points, noise
 
